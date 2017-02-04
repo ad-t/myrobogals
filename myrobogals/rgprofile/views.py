@@ -162,15 +162,18 @@ def editusers(request, chapterurl):
 			status = request.GET['status']
 		else:
 			status = '1'   # Default to student members
-
+                if 'includeInactive' in request.GET:
+                    includeInactive = " "
+                else:
+                    includeInactive = " AND u.is_active = 1 "
 		if (status != '0'):
 			users = User.objects.raw('SELECT u.* FROM rgprofile_user AS u, rgprofile_memberstatus AS ms WHERE u.chapter_id ' +
 					'= '+ str(c.pk) +' AND u.id = ms.user_id AND ms.statusType_id = '+ status +' AND ms.status_date_end IS NULL ' +
-					searchsql + ' ORDER BY last_name, first_name')
+					searchsql + includeInactive + '  ORDER BY last_name, first_name')
 		else:
 			users = User.objects.raw('SELECT u.* FROM rgprofile_user AS u WHERE u.chapter_id ' +
 					'= '+ str(c.pk) + ' ' +
-					searchsql + ' ORDER BY last_name, first_name')
+					searchsql + includeInactive + ' ORDER BY last_name, first_name')
 		display_columns = c.display_columns.all()
 		return render_to_response('user_list.html', {'memberstatustypes': memberstatustypes, 'users': users, 'numusers': len(list(users)), 'search': search, 'status': int(status), 'chapter': c, 'display_columns': display_columns, 'return': request.path + '?' + request.META['QUERY_STRING'], 'MEDIA_URL': MEDIA_URL}, context_instance=RequestContext(request))
 	else:

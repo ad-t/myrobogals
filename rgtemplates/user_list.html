@@ -25,8 +25,12 @@
 <option value="0" {% ifequal 0 status %}selected="selected"{% endifequal %}>All</option>
 </select>
 <br>
-<input type="checkbox" name="includeRetired">{% trans "Include retired members" %}
-Value: {{ request.GET.includeRetired }} 
+{% if request.GET.includeInactive %}
+    <input type="checkbox" name="includeInactive" checked>
+{% else %}
+    <input type="checkbox" name="includeInactive">
+{% endif %}
+Include inactive
 <br>
 <input type="submit" value="{% trans "Filter" %}">
 </form>
@@ -43,7 +47,6 @@ Value: {{ request.GET.includeRetired }}
         <td><strong>{% trans "Delete" %}</strong></td>
     </tr>
     {% for u in users %}
-    {% if request.GET.includeRetired != "on" %}
     <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
         <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
         {% for col in display_columns %}
@@ -51,7 +54,6 @@ Value: {{ request.GET.includeRetired }}
         {% endfor %}
         <td><a href="/delete/user/{{u.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
     </tr>
-    {% endif %}
     {% endfor %}
 </table>
 <p align="right"><b>{% trans "Members in list:" %} {{ numusers }}</b></p>
