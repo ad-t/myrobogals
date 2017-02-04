@@ -10,6 +10,7 @@ core
 tags
 static
 myrobogals.db
+/venv/
 *.swp
 *.pyc
 *.o

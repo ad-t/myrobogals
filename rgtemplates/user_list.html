@@ -24,6 +24,10 @@
 {% endfor %}
 <option value="0" {% ifequal 0 status %}selected="selected"{% endifequal %}>All</option>
 </select>
+<br>
+<input type="checkbox" name="includeRetired">{% trans "Include retired members" %}
+Value: {{ request.GET.includeRetired }} 
+<br>
 <input type="submit" value="{% trans "Filter" %}">
 </form>
 </div></div></div></div>
@@ -31,22 +35,24 @@
 {% block noboxcontent %}
 <p align="left"><b>{% trans "Members in list:" %} {{ numusers }}</b></p>
 <table border="1" rules="NONE" frame="BOX" cellpadding="5" cellspacing="0" width="100%">
-  <tr class="even">
-    <td><strong>{% trans "Username" %}</strong></td>
-    {% for col in display_columns %}
-    <td><strong>{{col.display_name_local}}</strong></td>
+    <tr class="even">
+        <td><strong>{% trans "Username" %}</strong></td>
+        {% for col in display_columns %}
+        <td><strong>{{col.display_name_local}}</strong></td>
+        {% endfor %}
+        <td><strong>{% trans "Delete" %}</strong></td>
+    </tr>
+    {% for u in users %}
+    {% if request.GET.includeRetired != "on" %}
+    <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
+        <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
+        {% for col in display_columns %}
+        <td>{% get_user_attr u col.field_name %}</td>
+        {% endfor %}
+        <td><a href="/delete/user/{{u.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
+    </tr>
+    {% endif %}
     {% endfor %}
-	<td><strong>{% trans "Delete" %}</strong></td>
-  </tr>
-{% for u in users %}
-  <tr class="{% if forloop.counter|divisibleby:2 %}even{% else %}odd{% endif %}">
-    <td><a href="/profile/{{u.username}}/edit/?return={{return|urlencode}}">{{u.username}}</a></td>
-	{% for col in display_columns %}
-    <td>{% get_user_attr u col.field_name %}</td>
-    {% endfor %}
-	<td><a href="/delete/user/{{u.pk}}/?return={{return|urlencode}}"><img src="{{ MEDIA_URL }}images/delete.png" alt="Delete" /></a></td>
-  </tr>
-{% endfor %}
 </table>
 <p align="right"><b>{% trans "Members in list:" %} {{ numusers }}</b></p>
 

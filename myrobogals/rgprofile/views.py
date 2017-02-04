@@ -680,6 +680,7 @@ class FormPartFive(forms.Form):
 	security_check = forms.BooleanField(label=_('Passed the Police Check'), initial=False, required=False)
 	trained = forms.BooleanField(label=_('Trained and approved to teach'), initial=False, required=False)
 	internal_notes = forms.CharField(label=_('Internal notes'), required=False, widget=forms.Textarea(attrs={'cols': '35', 'rows': '7'}))
+        is_active = forms.BooleanField(label=_('Active'), initial=True, required=False)
 
 def edituser(request, username, chapter=None):
 	pwerr = ''
@@ -707,7 +708,7 @@ def edituser(request, username, chapter=None):
 			formpart4 = FormPartFour(request.POST, chapter=chapter)
 			formpart5 = FormPartFive(request.POST, chapter=chapter)
 			if formpart1.is_valid() and formpart2.is_valid() and formpart3.is_valid() and formpart4.is_valid() and formpart5.is_valid():
-				if (('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST)):
+				if (('internal_notes' in request.POST) or ('trained' in request.POST) or ('security_check' in request.POST) or ('is_active' in request.POST)):
 					attempt_modify_exec_fields = True
 				else:
 					attempt_modify_exec_fields = False
@@ -799,6 +800,7 @@ def edituser(request, username, chapter=None):
 						u.internal_notes = data['internal_notes']
 						u.trained = data['trained']
 						u.security_check = data['security_check']
+                                                u.is_active = data['is_active']
 					u.save()
 					if 'return' in request.POST:
 						messages.success(request, message=unicode(_("%(username)s has been added to the chapter") % {'username': u.username}))
@@ -914,7 +916,8 @@ def edituser(request, username, chapter=None):
 				formpart5 = FormPartFive({
 					'internal_notes': u.internal_notes,
 					'trained': u.trained,
-					'security_check': u.security_check}, chapter=chapter)
+					'security_check': u.security_check,
+                                        'is_active': u.is_active}, chapter=chapter)
 		if 'return' in request.GET:
 			return_url = request.GET['return']
 		elif 'return' in request.POST:
